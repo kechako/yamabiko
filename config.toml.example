@@ -1,0 +1,13 @@
+#host = ""
+#port = 1178
+#send_encoding = "utf-8"
+#recv_encoding = "utf-8"
+
+#[logging]
+#path = ""
+#level = "info"
+#json = false
+
+#[[dictionaries]]
+#path = "/path/to/dictionary"
+#encoding = "euc-jp"

@@ -1,0 +1,18 @@
+[[dictionaries]]
+path = "dict1"
+
+[[dictionaries]]
+path = "dict2"
+encoding = "utf-8"
+
+[[dictionaries]]
+path = "dict3"
+encoding = "shift_jis"
+
+[[dictionaries]]
+path = "dict4"
+encoding = "iso-2022-jp"
+
+[[dictionaries]]
+path = "dict5"
+encoding = "euc-jp"
