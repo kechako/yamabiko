@@ -25,7 +25,6 @@ func main() {
 						Name:    "config",
 						Aliases: []string{"c"},
 						Usage:   "Path to the configuration file",
-						Value:   "config.toml",
 					},
 				},
 			},

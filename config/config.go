@@ -5,6 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 	"github.com/kechako/skkdic"
@@ -127,4 +128,42 @@ func load(r io.Reader) (*Config, error) {
 	cfg.merge(defaultConfig)
 
 	return &cfg, nil
+}
+
+func FindConfigFile() (string, error) {
+	paths, err := getConfigFilePaths()
+	if err != nil {
+		return "", fmt.Errorf("config.FindConfigFile: %w", err)
+	}
+
+	for _, path := range paths {
+		if info, err := os.Stat(path); err == nil && !info.IsDir() {
+			return path, err
+		}
+	}
+
+	return "", nil
+}
+
+func getConfigFilePaths() ([]string, error) {
+	paths := []string{
+		"/etc/yamabiko/config.toml",
+		"/etc/yamabiko.toml",
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+	paths = append(paths, filepath.Join(home, ".config/yamabiko/config.toml"))
+	paths = append(paths, filepath.Join(home, ".yamabiko.toml"))
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+
+	paths = append(paths, filepath.Join(wd, "config.toml"))
+
+	return paths, nil
 }

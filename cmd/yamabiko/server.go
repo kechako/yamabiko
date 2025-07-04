@@ -9,16 +9,30 @@ import (
 )
 
 func serverCmd(ctx context.Context, cmd *cli.Command) error {
-	cfg, err := config.LoadFile(cmd.String("config"))
+	cfgPath := cmd.String("config")
+	if cfgPath == "" {
+		var err error
+		cfgPath, err = config.FindConfigFile()
+		if err != nil {
+			return cli.Exit(err, 1)
+		}
+	}
+
+	cfg, err := config.LoadFile(cfgPath)
 	if err != nil {
-		return err
+		return cli.Exit(err, 1)
 	}
 
 	s, err := server.New(cfg)
 	if err != nil {
-		return err
+		return cli.Exit(err, 1)
 	}
 	defer s.Close()
 
-	return s.Serve(ctx)
+	err = s.Serve(ctx)
+	if err != nil {
+		return cli.Exit(err, 1)
+	}
+
+	return nil
 }
