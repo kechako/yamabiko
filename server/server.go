@@ -285,7 +285,7 @@ func (s *Server) buildLogger(cfg *config.Config) error {
 	if cfg.Logging.Path == "" {
 		logWriter = os.Stdout
 	} else {
-		file, err := os.Create(cfg.Logging.Path)
+		file, err := os.OpenFile(cfg.Logging.Path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return fmt.Errorf("failed to create log file: %w", err)
 		}
