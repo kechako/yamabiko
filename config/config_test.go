@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log/slog"
 	"strings"
 	"testing"
 
@@ -12,6 +13,27 @@ var loadFileTests = map[string]struct {
 }{
 	"testdata/test01.toml": {
 		want: &Config{
+			Host: "",
+			Port: 1178,
+			Logging: &Logging{
+				Path:  "",
+				Level: slog.LevelInfo,
+				JSON:  false,
+			},
+			Dictionaries: nil,
+		},
+	},
+	"testdata/test02.toml": {
+		want: &Config{
+			Host:         "0.0.0.0",
+			Port:         12345,
+			SendEncoding: EUCJP,
+			RecvEncoding: ShiftJIS,
+			Logging: &Logging{
+				Path:  "/var/log/yamabiko-test.log",
+				Level: slog.LevelDebug,
+				JSON:  true,
+			},
 			Dictionaries: []*Dictionary{
 				{Path: "dict1", Encoding: Auto},
 				{Path: "dict2", Encoding: UTF8},
@@ -39,11 +61,29 @@ func TestLoadFile(t *testing.T) {
 }
 
 var loadTests = map[string]struct {
-	yaml string
+	toml string
 	want *Config
 }{
 	"test01": {
-		yaml: `dictionaries = [
+		toml: "",
+		want: &Config{
+			Host: "",
+			Port: 1178,
+			Logging: &Logging{
+				Path:  "",
+				Level: slog.LevelInfo,
+				JSON:  false,
+			},
+			Dictionaries: nil,
+		},
+	},
+	"test02": {
+		toml: `host = "0.0.0.0"
+port = 12345
+send_encoding = "euc-jp"
+recv_encoding = "shift_jis"
+logging = {path = "/var/log/yamabiko-test.log", level = "debug", json = true}
+dictionaries = [
   {path = "dict1"},
   {path = "dict2", encoding = "utf-8"},
   {path = "dict3", encoding = "shift_jis"},
@@ -51,6 +91,15 @@ var loadTests = map[string]struct {
   {path = "dict5", encoding = "euc-jp"},
 ]`,
 		want: &Config{
+			Host:         "0.0.0.0",
+			Port:         12345,
+			SendEncoding: EUCJP,
+			RecvEncoding: ShiftJIS,
+			Logging: &Logging{
+				Path:  "/var/log/yamabiko-test.log",
+				Level: slog.LevelDebug,
+				JSON:  true,
+			},
 			Dictionaries: []*Dictionary{
 				{Path: "dict1", Encoding: Auto},
 				{Path: "dict2", Encoding: UTF8},
@@ -60,16 +109,17 @@ var loadTests = map[string]struct {
 			},
 		},
 	},
-	"test02": {
-		yaml: "dictionaries = []",
-		want: &Config{
-			Dictionaries: []*Dictionary{},
-		},
-	},
 	"test03": {
-		yaml: "",
+		toml: "dictionaries = []",
 		want: &Config{
-			Dictionaries: nil,
+			Host: "",
+			Port: 1178,
+			Logging: &Logging{
+				Path:  "",
+				Level: slog.LevelInfo,
+				JSON:  false,
+			},
+			Dictionaries: []*Dictionary{},
 		},
 	},
 }
@@ -77,13 +127,13 @@ var loadTests = map[string]struct {
 func TestLoad(t *testing.T) {
 	for name, tt := range loadTests {
 		t.Run(name, func(t *testing.T) {
-			cfg, err := Load(strings.NewReader(tt.yaml))
+			cfg, err := Load(strings.NewReader(tt.toml))
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			if diff := cmp.Diff(tt.want, cfg); diff != "" {
-				t.Errorf("Load(%q) mismatch (-want +got):\n%s", tt.yaml, diff)
+				t.Errorf("Load(%q) mismatch (-want +got):\n%s", tt.toml, diff)
 			}
 		})
 	}

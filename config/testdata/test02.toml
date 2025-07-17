@@ -1,0 +1,28 @@
+host = "0.0.0.0"
+port = 12345
+send_encoding = "euc-jp"
+recv_encoding = "shift_jis"
+
+[logging]
+path = "/var/log/yamabiko-test.log"
+level = "debug"
+json = true
+
+[[dictionaries]]
+path = "dict1"
+
+[[dictionaries]]
+path = "dict2"
+encoding = "utf-8"
+
+[[dictionaries]]
+path = "dict3"
+encoding = "shift_jis"
+
+[[dictionaries]]
+path = "dict4"
+encoding = "iso-2022-jp"
+
+[[dictionaries]]
+path = "dict5"
+encoding = "euc-jp"

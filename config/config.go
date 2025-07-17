@@ -1,6 +1,8 @@
 package config
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"log/slog"
@@ -11,14 +13,17 @@ import (
 	"github.com/kechako/skkdic"
 )
 
-var defaultConfig = &Config{
-	Host: "",
-	Port: 1178,
-	Logging: &Logging{
-		Path:  "", // Default to stdout
-		Level: slog.LevelInfo,
-		JSON:  false,
-	},
+func defaultConfig() *Config {
+	return &Config{
+		Host: "",
+		Port: 1178,
+		Logging: &Logging{
+			Path:  "", // Default to stdout
+			Level: slog.LevelInfo,
+			JSON:  false,
+		},
+		Dictionaries: nil,
+	}
 }
 
 type Encoding = skkdic.Encoding
@@ -43,58 +48,13 @@ type Logging struct {
 	JSON  bool       `toml:"json"`
 }
 
-func (l *Logging) merge(other *Logging) {
-	if other == nil {
-		return
-	}
-
-	if other.Path != "" {
-		l.Path = other.Path
-	}
-	if other.Level < l.Level {
-		l.Level = other.Level
-	}
-	if other.JSON {
-		l.JSON = other.JSON
-	}
-}
-
 type Config struct {
 	Host         string        `toml:"host"`
 	Port         int           `toml:"port"`
 	SendEncoding Encoding      `toml:"send_encoding"`
 	RecvEncoding Encoding      `toml:"recv_encoding"`
-	Dictionaries []*Dictionary `toml:"dictionaries"`
 	Logging      *Logging      `toml:"logging"`
-}
-
-func (cfg *Config) merge(other *Config) {
-	if other == nil {
-		return
-	}
-
-	if other.Host != "" {
-		cfg.Host = other.Host
-	}
-	if other.Port > 0 {
-		cfg.Port = other.Port
-	}
-	if other.SendEncoding.IsValid() && other.SendEncoding != Default {
-		cfg.SendEncoding = other.SendEncoding
-	}
-	if other.RecvEncoding.IsValid() && other.RecvEncoding != Default {
-		cfg.RecvEncoding = other.RecvEncoding
-	}
-
-	if len(other.Dictionaries) > 0 {
-		cfg.Dictionaries = append(cfg.Dictionaries, other.Dictionaries...)
-	}
-
-	if cfg.Logging == nil {
-		cfg.Logging = other.Logging
-	} else {
-		cfg.Logging.merge(other.Logging)
-	}
+	Dictionaries []*Dictionary `toml:"dictionaries"`
 }
 
 func LoadFile(path string) (*Config, error) {
@@ -119,15 +79,13 @@ func Load(r io.Reader) (*Config, error) {
 }
 
 func load(r io.Reader) (*Config, error) {
-	var cfg Config
-	_, err := toml.NewDecoder(r).Decode(&cfg)
+	cfg := defaultConfig()
+	_, err := toml.NewDecoder(r).Decode(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	cfg.merge(defaultConfig)
-
-	return &cfg, nil
+	return cfg, nil
 }
 
 func FindConfigFile() (string, error) {
