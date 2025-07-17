@@ -1,0 +1,10 @@
+[[dictionaries]]
+path = "${YAMABIKO_TEST01}/dict1"
+
+[[dictionaries]]
+path = "$YAMABIKO_TEST02/dict2"
+encoding = "utf-8"
+
+[[dictionaries]]
+path = "dict3"
+encoding = "${YAMABIKO_TEST03}"

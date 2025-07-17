@@ -79,8 +79,20 @@ func Load(r io.Reader) (*Config, error) {
 }
 
 func load(r io.Reader) (*Config, error) {
+	var buf bytes.Buffer
+	s := bufio.NewScanner(r)
+	for s.Scan() {
+		line := s.Text()
+		line = os.ExpandEnv(line)
+		buf.WriteString(line)
+		buf.WriteByte('\n')
+	}
+	if err := s.Err(); err != nil {
+		return nil, fmt.Errorf("config.load: failed to read config: %w", err)
+	}
+
 	cfg := defaultConfig()
-	_, err := toml.NewDecoder(r).Decode(cfg)
+	_, err := toml.NewDecoder(&buf).Decode(cfg)
 	if err != nil {
 		return nil, err
 	}
