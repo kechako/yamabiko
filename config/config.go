@@ -1,3 +1,4 @@
+// Package config provides functions to load and manage configuration settings
 package config
 
 import (
@@ -15,8 +16,9 @@ import (
 
 func defaultConfig() *Config {
 	return &Config{
-		Host: "",
-		Port: 1178,
+		Host:           "",
+		Port:           1178,
+		MaxCompletions: 10,
 		Logging: &Logging{
 			Path:  "", // Default to stdout
 			Level: slog.LevelInfo,
@@ -49,12 +51,13 @@ type Logging struct {
 }
 
 type Config struct {
-	Host         string        `toml:"host"`
-	Port         int           `toml:"port"`
-	SendEncoding Encoding      `toml:"send_encoding"`
-	RecvEncoding Encoding      `toml:"recv_encoding"`
-	Logging      *Logging      `toml:"logging"`
-	Dictionaries []*Dictionary `toml:"dictionaries"`
+	Host           string        `toml:"host"`
+	Port           int           `toml:"port"`
+	SendEncoding   Encoding      `toml:"send_encoding"`
+	RecvEncoding   Encoding      `toml:"recv_encoding"`
+	MaxCompletions int           `toml:"max_completions"`
+	Logging        *Logging      `toml:"logging"`
+	Dictionaries   []*Dictionary `toml:"dictionaries"`
 }
 
 func LoadFile(path string) (*Config, error) {

@@ -15,8 +15,9 @@ var loadFileTests = map[string]struct {
 	"testdata/test01.toml": {
 		envs: nil,
 		want: &Config{
-			Host: "",
-			Port: 1178,
+			Host:           "",
+			Port:           1178,
+			MaxCompletions: 10,
 			Logging: &Logging{
 				Path:  "",
 				Level: slog.LevelInfo,
@@ -28,10 +29,11 @@ var loadFileTests = map[string]struct {
 	"testdata/test02.toml": {
 		envs: nil,
 		want: &Config{
-			Host:         "0.0.0.0",
-			Port:         12345,
-			SendEncoding: EUCJP,
-			RecvEncoding: ShiftJIS,
+			Host:           "0.0.0.0",
+			Port:           12345,
+			SendEncoding:   EUCJP,
+			RecvEncoding:   ShiftJIS,
+			MaxCompletions: 20,
 			Logging: &Logging{
 				Path:  "/var/log/yamabiko-test.log",
 				Level: slog.LevelDebug,
@@ -53,8 +55,9 @@ var loadFileTests = map[string]struct {
 			"YAMABIKO_TEST03": "euc-jp",
 		},
 		want: &Config{
-			Host: "",
-			Port: 1178,
+			Host:           "",
+			Port:           1178,
+			MaxCompletions: 10,
 			Logging: &Logging{
 				Path:  "",
 				Level: slog.LevelInfo,
@@ -97,8 +100,9 @@ var loadTests = map[string]struct {
 		toml: "",
 		envs: nil,
 		want: &Config{
-			Host: "",
-			Port: 1178,
+			Host:           "",
+			Port:           1178,
+			MaxCompletions: 10,
 			Logging: &Logging{
 				Path:  "",
 				Level: slog.LevelInfo,
@@ -112,6 +116,7 @@ var loadTests = map[string]struct {
 port = 12345
 send_encoding = "euc-jp"
 recv_encoding = "shift_jis"
+max_completions = 20
 logging = {path = "/var/log/yamabiko-test.log", level = "debug", json = true}
 dictionaries = [
   {path = "dict1"},
@@ -122,10 +127,11 @@ dictionaries = [
 ]`,
 		envs: nil,
 		want: &Config{
-			Host:         "0.0.0.0",
-			Port:         12345,
-			SendEncoding: EUCJP,
-			RecvEncoding: ShiftJIS,
+			Host:           "0.0.0.0",
+			Port:           12345,
+			SendEncoding:   EUCJP,
+			RecvEncoding:   ShiftJIS,
+			MaxCompletions: 20,
 			Logging: &Logging{
 				Path:  "/var/log/yamabiko-test.log",
 				Level: slog.LevelDebug,
@@ -144,8 +150,9 @@ dictionaries = [
 		toml: "dictionaries = []",
 		envs: nil,
 		want: &Config{
-			Host: "",
-			Port: 1178,
+			Host:           "",
+			Port:           1178,
+			MaxCompletions: 10,
 			Logging: &Logging{
 				Path:  "",
 				Level: slog.LevelInfo,
@@ -166,8 +173,9 @@ dictionaries = [
 			"YAMABIKO_TEST03": "euc-jp",
 		},
 		want: &Config{
-			Host: "",
-			Port: 1178,
+			Host:           "",
+			Port:           1178,
+			MaxCompletions: 10,
 			Logging: &Logging{
 				Path:  "",
 				Level: slog.LevelInfo,

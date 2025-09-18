@@ -2,6 +2,7 @@
 #port = 1178
 #send_encoding = "utf-8"
 #recv_encoding = "utf-8"
+#max_completions = 10
 
 #[logging]
 #path = ""

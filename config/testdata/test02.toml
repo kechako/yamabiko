@@ -2,6 +2,7 @@ host = "0.0.0.0"
 port = 12345
 send_encoding = "euc-jp"
 recv_encoding = "shift_jis"
+max_completions = 20
 
 [logging]
 path = "/var/log/yamabiko-test.log"

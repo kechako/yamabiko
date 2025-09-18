@@ -181,6 +181,8 @@ func (s *Server) serve(ctx context.Context, conn net.Conn) {
 	w := sendEnc.NewEncoder().Writer(conn)
 	r := recvEnc.NewDecoder().Reader(conn)
 
+	maxCompletions := s.cfg.MaxCompletions
+
 	buf := make([]byte, 1024)
 	var ret bytes.Buffer
 	ret.Grow(4096)
@@ -242,8 +244,38 @@ loop:
 			ret.WriteString(conn.LocalAddr().String())
 		case ClientCompletion:
 			logger.Debug("COMPLETION")
-			ret.WriteRune(ServerFound)
-			ret.WriteString("//\n")
+			i := strings.IndexByte(cmd, ' ')
+			if i < 0 {
+				i = strings.IndexByte(cmd, '\n')
+			}
+			if i < 0 {
+				i = len(cmd)
+			}
+
+			key := cmd[1:i]
+			logger.Debug("COMPLETION", slog.String("key", key))
+
+			candidates := s.d.Lookup(key)
+			if isEmpty(candidates) {
+				ret.WriteRune(ServerNotFound)
+				ret.WriteString(cmd[1:])
+				logger.Debug("COMPLETION: not found", slog.String("key", key))
+			} else {
+				ret.WriteRune(ServerFound)
+				cnt := 0
+				for c := range s.d.Lookup(key) {
+					if cnt >= maxCompletions {
+						break
+					}
+					ret.WriteRune('/')
+					ret.WriteString(c.String())
+					cnt++
+				}
+				ret.WriteString("/\n")
+				if logger.Enabled(ctx, slog.LevelDebug) {
+					logger.Debug("COMPLETION", slog.String("candidate", ret.String()))
+				}
+			}
 		default:
 			logger.Warn("UNKNOWN COMMAND", slog.String("command", cmd))
 			continue
