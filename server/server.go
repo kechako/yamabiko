@@ -255,7 +255,7 @@ loop:
 			key := cmd[1:i]
 			logger.Debug("COMPLETION", slog.String("key", key))
 
-			candidates := s.d.Lookup(key)
+			candidates := s.d.Complete(key, true)
 			if isEmpty(candidates) {
 				ret.WriteRune(ServerNotFound)
 				ret.WriteString(cmd[1:])
