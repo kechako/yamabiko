@@ -255,20 +255,20 @@ loop:
 			key := cmd[1:i]
 			logger.Debug("COMPLETION", slog.String("key", key))
 
-			candidates := s.d.Complete(key, true)
-			if isEmpty(candidates) {
+			completions := s.d.Complete(key, true)
+			if isEmpty(completions) {
 				ret.WriteRune(ServerNotFound)
 				ret.WriteString(cmd[1:])
 				logger.Debug("COMPLETION: not found", slog.String("key", key))
 			} else {
 				ret.WriteRune(ServerFound)
 				cnt := 0
-				for c := range s.d.Lookup(key) {
+				for completion := range completions {
 					if cnt >= maxCompletions {
 						break
 					}
 					ret.WriteRune('/')
-					ret.WriteString(c.String())
+					ret.WriteString(completion.Midashi)
 					cnt++
 				}
 				ret.WriteString("/\n")
